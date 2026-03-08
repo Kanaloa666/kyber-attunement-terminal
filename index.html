@@ -8,9 +8,7 @@
   <style>
     :root{
       --bg:#050607;
-      --bg2:#081018;
       --panel:#0c0f12;
-      --panel2:rgba(12,15,18,0.78);
       --text:#e7e7e7;
       --muted:#9aa6b2;
       --line:#1b2530;
@@ -552,6 +550,39 @@
   <div class="dust"></div>
   <div class="static" id="static"></div>
 
+  <!-- AUDIO -->
+  <audio id="audioStartup" preload="auto">
+    <source src="audio/light-saber-startup.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="audioHum" preload="auto" loop>
+    <source src="audio/lightsaber-hum.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="audioPulse" preload="auto">
+    <source src="audio/deep-harmonic-tonal-whoosh.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="voiceBlue" preload="auto">
+    <source src="audio/your-move.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="voiceGreen" preload="auto">
+    <source src="audio/ah-yes.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="voiceRed" preload="auto">
+    <source src="audio/jedi-scum.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="voiceBlack" preload="auto">
+    <source src="audio/yes-master-yes-darth-vader-ok-obedient-will-do-okay-master-star-wars-prequel-memes.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="voiceYellow" preload="auto">
+    <source src="audio/everything-s-perfectly-all-right-now-we-re-fine-we-re-all-fine-here-now-thank-you-how-are-you.mp3" type="audio/mpeg">
+  </audio>
+
   <div class="wrap">
     <div class="topbar">
       <div class="badge">
@@ -576,7 +607,6 @@
       </div>
 
       <div class="content">
-        <!-- IDLE PAGE -->
         <section class="page" id="idlePage">
           <h1 class="h1">Black Spire Node Online</h1>
           <p class="sub">
@@ -610,7 +640,6 @@
           </div>
         </section>
 
-        <!-- PAGE 1 -->
         <section class="page hidden" id="p1">
           <h1 class="h1">Initialize Force Attunement</h1>
           <p class="sub">
@@ -630,7 +659,6 @@
           </div>
         </section>
 
-        <!-- PAGE 2 -->
         <section class="page hidden" id="p2">
           <h1 class="h1">Resonance Detected</h1>
           <p class="sub">
@@ -650,7 +678,6 @@
           </div>
         </section>
 
-        <!-- PAGE 3 -->
         <section class="page hidden" id="p3">
           <h1 class="h1">Attunement I</h1>
           <p class="sub">When pressure rises, your first instinct is to…</p>
@@ -680,7 +707,6 @@
           </button>
         </section>
 
-        <!-- PAGE 4 -->
         <section class="page hidden" id="p4">
           <h1 class="h1">Attunement II</h1>
           <p class="sub">Power is best understood as…</p>
@@ -710,7 +736,6 @@
           </button>
         </section>
 
-        <!-- PAGE 5 -->
         <section class="page hidden" id="p5">
           <h1 class="h1">Attunement III</h1>
           <p class="sub">Your compass points toward…</p>
@@ -740,7 +765,6 @@
           </button>
         </section>
 
-        <!-- PAGE 6 -->
         <section class="page hidden" id="p6">
           <h1 class="h1">Calibrating Kyber Resonance</h1>
           <p class="sub" id="loadText">Sampling field harmonics…</p>
@@ -758,7 +782,6 @@
           </div>
         </section>
 
-        <!-- PAGE 7 -->
         <section class="page hidden" id="p7">
           <h1 class="h1">Attunement Complete</h1>
           <p class="sub" id="resultSubtitle">
@@ -792,8 +815,112 @@
       secretDotClicks: 0,
       secretSessionClicks: 0,
       secretRingPress: false,
-      result: null
+      result: null,
+      audioUnlocked: false
     };
+
+    const audio = {
+      startup: null,
+      hum: null,
+      pulse: null,
+      voices: {}
+    };
+
+    function initAudio() {
+      audio.startup = $("audioStartup");
+      audio.hum = $("audioHum");
+      audio.pulse = $("audioPulse");
+
+      audio.voices = {
+        Blue: $("voiceBlue"),
+        Green: $("voiceGreen"),
+        Red: $("voiceRed"),
+        Yellow: $("voiceYellow"),
+        Black: $("voiceBlack")
+      };
+
+      if (audio.startup) audio.startup.volume = 0.70;
+      if (audio.hum) audio.hum.volume = 0.16;
+      if (audio.pulse) audio.pulse.volume = 0.60;
+
+      Object.values(audio.voices).forEach((clip) => {
+        if (clip) clip.volume = 0.95;
+      });
+    }
+
+    function unlockAudio() {
+      if (state.audioUnlocked) return;
+      state.audioUnlocked = true;
+
+      [audio.startup, audio.hum, audio.pulse, ...Object.values(audio.voices)].forEach((clip) => {
+        if (!clip) return;
+        try { clip.load(); } catch (e) {}
+      });
+    }
+
+    async function playStartupAndHum() {
+      unlockAudio();
+
+      try {
+        stopVoiceLines();
+        if (audio.startup) {
+          audio.startup.currentTime = 0;
+          await audio.startup.play();
+        }
+      } catch (e) {}
+
+      setTimeout(() => {
+        try {
+          if (audio.hum) {
+            audio.hum.currentTime = 0;
+            audio.hum.play().catch(() => {});
+          }
+        } catch (e) {}
+      }, 140);
+    }
+
+    function playPulse() {
+      unlockAudio();
+      try {
+        if (audio.pulse) {
+          audio.pulse.currentTime = 0;
+          audio.pulse.play().catch(() => {});
+        }
+      } catch (e) {}
+    }
+
+    function setHumVolume(level) {
+      if (!audio.hum) return;
+      audio.hum.volume = Math.max(0, Math.min(1, level));
+    }
+
+    function stopHum() {
+      if (!audio.hum) return;
+      try {
+        audio.hum.pause();
+        audio.hum.currentTime = 0;
+      } catch (e) {}
+    }
+
+    function stopVoiceLines() {
+      Object.values(audio.voices).forEach((clip) => {
+        if (!clip) return;
+        try {
+          clip.pause();
+          clip.currentTime = 0;
+        } catch (e) {}
+      });
+    }
+
+    function playVoiceForColor(color) {
+      stopVoiceLines();
+      const clip = audio.voices[color];
+      if (!clip) return;
+      try {
+        clip.currentTime = 0;
+        clip.play().catch(() => {});
+      } catch (e) {}
+    }
 
     function staticGlitch() {
       const el = $("static");
@@ -826,6 +953,8 @@
       state.secretRingPress = false;
       state.result = null;
       $("hiddenPrompt").classList.add("hidden");
+      stopVoiceLines();
+      stopHum();
     }
 
     function setHeader(title, status) {
@@ -952,17 +1081,25 @@
         setTimeout(staticGlitch, 180);
         setTimeout(staticGlitch, 320);
         setHeader("RESULT // ANOMALY DETECTED", "UNSTABLE");
+        setHumVolume(0.12);
       } else {
         $("resultSubtitle").textContent = "The terminal has identified a likely resonance path.";
         setHeader("RESULT // KYBER RECOMMENDATION", "COMPLETE");
+        setHumVolume(0.10);
       }
 
       go("p7");
+
+      setTimeout(() => {
+        playVoiceForColor(color);
+      }, 350);
     }
 
     function runLoadingSequence() {
       go("p6");
       setHeader("CALIBRATION // ANALYSIS", "RUNNING");
+      playPulse();
+      setHumVolume(state.secretUnlocked ? 0.24 : 0.20);
 
       const bar = $("barFill");
       const loadText = $("loadText");
@@ -1040,19 +1177,23 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      initAudio();
       $("sessionId").textContent = randId();
 
       go("idlePage");
       setHeader("KYBER ATTUNEMENT PROTOCOL", "STANDBY");
 
-      $("beginBtn").addEventListener("click", () => {
+      $("beginBtn").addEventListener("click", async () => {
         staticGlitch();
+        await playStartupAndHum();
         go("p1");
         setHeader("ATTUNEMENT // INITIALIZATION", "READY");
       });
 
       $("toResonanceBtn").addEventListener("click", () => {
         staticGlitch();
+        playPulse();
+        setHumVolume(0.16);
         go("p2");
         setHeader("RESONANCE FIELD MONITOR", "LOCKED");
       });
@@ -1065,12 +1206,14 @@
 
       $("toQ1Btn").addEventListener("click", () => {
         staticGlitch();
+        playPulse();
         go("p3");
         setHeader("ATTUNEMENT // PHASE I", "INPUT REQUIRED");
       });
 
       $("backToStartBtn").addEventListener("click", () => {
         staticGlitch();
+        playPulse();
         go("p1");
         setHeader("ATTUNEMENT // INITIALIZATION", "READY");
       });
@@ -1082,6 +1225,7 @@
 
           state.answers[question] = answer;
           staticGlitch();
+          playPulse();
 
           if (question === "q1") {
             go("p4");
@@ -1129,6 +1273,7 @@
         state.secretUnlocked = true;
         $("hiddenPrompt").classList.add("hidden");
         staticGlitch();
+        playPulse();
         go("p1");
         setHeader("ATTUNEMENT // INITIALIZATION", "ANOMALY LOCKED");
       });
