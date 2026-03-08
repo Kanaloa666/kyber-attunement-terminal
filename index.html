@@ -27,12 +27,13 @@
       <div class="panelTop">
         <p class="title" id="panelTitle">KYBER ATTUNEMENT PROTOCOL</p>
         <div class="status">
-          <span class="dot"></span>
+          <span class="dot" id="statusDot"></span>
           <span id="panelStatus">STANDBY</span>
         </div>
       </div>
 
       <div class="content">
+
         <section class="page" id="p1">
           <h1 class="h1">Initialize Force Attunement</h1>
           <p class="sub">Place your hand over the chamber. Breathe once. Let Batuu fall away.</p>
@@ -40,32 +41,162 @@
           <div class="viz">
             <p class="label">SIGNAL // LOW-POWER RESONANCE</p>
             <div class="aura"></div>
-            <div class="ring"></div>
+            <div class="ring" id="mainRing"></div>
             <p class="tiny">The terminal reads resonance only.</p>
           </div>
 
           <div class="btnRow">
             <button class="primary" id="beginBtn">BEGIN</button>
           </div>
+
+          <div class="hiddenPrompt hidden" id="hiddenPrompt">
+            <p class="small">
+              SIGNAL BREAK // UNRESOLVED ECHO DETECTED<br />
+              A silent frequency waits beneath the lattice.
+            </p>
+            <div class="btnRow">
+              <button class="primary" id="blackAcceptBtn">LISTEN</button>
+              <button id="blackDeclineBtn">IGNORE</button>
+            </div>
+          </div>
         </section>
 
         <section class="page hidden" id="p2">
-          <h1 class="h1">Attunement Complete</h1>
-          <p class="sub">A resonance path has been detected.</p>
+          <h1 class="h1">Resonance Detected</h1>
+          <p class="sub">The field is stable. Do not force the answer. Let instinct move first.</p>
 
-          <div class="resultBox">
-            <div class="glow" id="glow"></div>
-            <p class="big" id="resultName">BLUE — The Oath of the Guardian</p>
-            <p class="small" id="resultLore">
-              You stand when others step back.
-              The crystal answers your steadiness, like a beacon through dust storms.
-            </p>
+          <div class="viz">
+            <p class="label">FIELD // HARMONIC LOCK</p>
+            <div class="aura"></div>
+            <div class="ring"></div>
+            <p class="tiny">Proceed when the signal feels true.</p>
           </div>
 
           <div class="btnRow">
-            <button class="primary" id="resetBtn">NEW ATTUNEMENT</button>
+            <button class="primary" id="toQ1Btn">CONTINUE</button>
+            <button id="backToStartBtn">BACK</button>
           </div>
         </section>
+
+        <section class="page hidden" id="p3">
+          <h1 class="h1">Attunement I</h1>
+          <p class="sub">When pressure rises, your first instinct is to…</p>
+
+          <button class="choice" data-q="q1" data-a="protect">
+            <span class="k"></span>
+            <span class="t">
+              <strong>Protect</strong>
+              <span>Stand between danger and what matters.</span>
+            </span>
+          </button>
+
+          <button class="choice" data-q="q1" data-a="observe">
+            <span class="k"></span>
+            <span class="t">
+              <strong>Observe</strong>
+              <span>Read the moment before you move.</span>
+            </span>
+          </button>
+
+          <button class="choice" data-q="q1" data-a="act">
+            <span class="k"></span>
+            <span class="t">
+              <strong>Act</strong>
+              <span>Cut through hesitation and create momentum.</span>
+            </span>
+          </button>
+        </section>
+
+        <section class="page hidden" id="p4">
+          <h1 class="h1">Attunement II</h1>
+          <p class="sub">Power is best understood as…</p>
+
+          <button class="choice" data-q="q2" data-a="responsibility">
+            <span class="k"></span>
+            <span class="t">
+              <strong>Responsibility</strong>
+              <span>It must be carried carefully.</span>
+            </span>
+          </button>
+
+          <button class="choice" data-q="q2" data-a="tool">
+            <span class="k"></span>
+            <span class="t">
+              <strong>A Tool</strong>
+              <span>Useful, neutral, shaped by the one who holds it.</span>
+            </span>
+          </button>
+
+          <button class="choice" data-q="q2" data-a="weapon">
+            <span class="k"></span>
+            <span class="t">
+              <strong>A Weapon</strong>
+              <span>Meant to end conflict decisively.</span>
+            </span>
+          </button>
+        </section>
+
+        <section class="page hidden" id="p5">
+          <h1 class="h1">Attunement III</h1>
+          <p class="sub">Your compass points toward…</p>
+
+          <button class="choice" data-q="q3" data-a="loyalty">
+            <span class="k"></span>
+            <span class="t">
+              <strong>Loyalty</strong>
+              <span>You do not abandon your people.</span>
+            </span>
+          </button>
+
+          <button class="choice" data-q="q3" data-a="knowledge">
+            <span class="k"></span>
+            <span class="t">
+              <strong>Knowledge</strong>
+              <span>Truth first. Then action.</span>
+            </span>
+          </button>
+
+          <button class="choice" data-q="q3" data-a="freedom">
+            <span class="k"></span>
+            <span class="t">
+              <strong>Freedom</strong>
+              <span>Your path must remain your own.</span>
+            </span>
+          </button>
+        </section>
+
+        <section class="page hidden" id="p6">
+          <h1 class="h1">Calibrating Kyber Resonance</h1>
+          <p class="sub" id="loadText">Sampling field harmonics…</p>
+
+          <div class="viz">
+            <p class="label">ANALYSIS // RUNNING</p>
+            <div class="bar">
+              <div id="barFill"></div>
+            </div>
+            <p class="tiny" id="loadLines">
+              &gt; establishing baseline…<br />
+              &gt; correcting drift…<br />
+              &gt; isolating signature…
+            </p>
+          </div>
+        </section>
+
+        <section class="page hidden" id="p7">
+          <h1 class="h1">Attunement Complete</h1>
+          <p class="sub" id="resultSubtitle">The terminal has identified a likely resonance path.</p>
+
+          <div class="resultBox">
+            <div class="glow" id="glow"></div>
+            <p class="big" id="resultName">—</p>
+            <p class="small" id="resultLore">—</p>
+          </div>
+
+          <div class="btnRow">
+            <button class="primary" id="restartBtn">NEW ATTUNEMENT</button>
+          </div>
+        </section>
+
       </div>
     </div>
   </div>
