@@ -1,6 +1,75 @@
 <!doctype html>
-<html>
-  <body style="background:black;color:lime;font-size:40px;">
-    TEST PAGE
-  </body>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kyber Crystal Attunement // Black Spire Outpost</title>
+  <meta name="theme-color" content="#050607" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="crt">
+  <div class="static" id="static"></div>
+
+  <div class="wrap">
+    <div class="topbar">
+      <div class="badge">
+        <strong>BLACK SPIRE OUTPOST</strong><br />
+        Batuu // Subsector 12<br />
+        Kyber Handling Terminal
+      </div>
+      <div class="badge">
+        SESSION: <span id="sessionId">—</span><br />
+        LINK: NFC INITIATED
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panelTop">
+        <p class="title" id="panelTitle">KYBER ATTUNEMENT PROTOCOL</p>
+        <div class="status">
+          <span class="dot"></span>
+          <span id="panelStatus">STANDBY</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <section class="page" id="p1">
+          <h1 class="h1">Initialize Force Attunement</h1>
+          <p class="sub">Place your hand over the chamber. Breathe once. Let Batuu fall away.</p>
+
+          <div class="viz">
+            <p class="label">SIGNAL // LOW-POWER RESONANCE</p>
+            <div class="aura"></div>
+            <div class="ring"></div>
+            <p class="tiny">The terminal reads resonance only.</p>
+          </div>
+
+          <div class="btnRow">
+            <button class="primary" id="beginBtn">BEGIN</button>
+          </div>
+        </section>
+
+        <section class="page hidden" id="p2">
+          <h1 class="h1">Attunement Complete</h1>
+          <p class="sub">A resonance path has been detected.</p>
+
+          <div class="resultBox">
+            <div class="glow" id="glow"></div>
+            <p class="big" id="resultName">BLUE — The Oath of the Guardian</p>
+            <p class="small" id="resultLore">
+              You stand when others step back.
+              The crystal answers your steadiness, like a beacon through dust storms.
+            </p>
+          </div>
+
+          <div class="btnRow">
+            <button class="primary" id="resetBtn">NEW ATTUNEMENT</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
 </html>
