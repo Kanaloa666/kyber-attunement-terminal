@@ -24,7 +24,11 @@ function staticGlitch() {
 function go(pageId) {
   const pages = document.querySelectorAll(".page");
   pages.forEach((page) => page.classList.add("hidden"));
-  $(pageId).classList.remove("hidden");
+
+  const target = $(pageId);
+  if (target) {
+    target.classList.remove("hidden");
+  }
 }
 
 function randId() {
@@ -34,12 +38,17 @@ function randId() {
 }
 
 function resetState() {
-  state.answers = { q1: null, q2: null, q3: null };
-  state.result = null;
+  state.answers = {
+    q1: null,
+    q2: null,
+    q3: null
+  };
+
   state.secretUnlocked = false;
   state.secretDotClicks = 0;
   state.secretSessionClicks = 0;
   state.secretRingPress = false;
+  state.result = null;
 
   $("hiddenPrompt").classList.add("hidden");
 }
@@ -57,7 +66,9 @@ function scoreResult() {
     Red: 0
   };
 
-  const { q1, q2, q3 } = state.answers;
+  const q1 = state.answers.q1;
+  const q2 = state.answers.q2;
+  const q3 = state.answers.q3;
 
   if (q1 === "protect") {
     scores.Blue += 3;
@@ -98,17 +109,17 @@ function scoreResult() {
     scores.Red += 1;
   }
 
-  let best = "Yellow";
+  let bestColor = "Yellow";
   let bestScore = -1;
 
   ["Yellow", "Blue", "Green", "Red"].forEach((color) => {
     if (scores[color] > bestScore) {
       bestScore = scores[color];
-      best = color;
+      bestColor = color;
     }
   });
 
-  return best;
+  return bestColor;
 }
 
 function getLore(color) {
@@ -144,9 +155,34 @@ function getGlow(color) {
     Blue: "#4aa3ff",
     Green: "#44ff8a",
     Red: "#ff4a4a",
-    Black: "#777777"
+    Black: "#8a8a8a"
   };
+
   return map[color] || "#4aa3ff";
+}
+
+function showResult() {
+  const color = state.secretUnlocked ? "Black" : scoreResult();
+  state.result = color;
+
+  const lore = getLore(color);
+
+  $("resultName").textContent = lore.title;
+  $("resultLore").textContent = lore.text;
+  $("glow").style.background = `radial-gradient(circle at 50% 30%, ${getGlow(color)}, transparent 62%)`;
+
+  if (color === "Black") {
+    $("resultSubtitle").textContent = "An anomaly answered the call.";
+    staticGlitch();
+    setTimeout(staticGlitch, 180);
+    setTimeout(staticGlitch, 320);
+    setHeader("RESULT // ANOMALY DETECTED", "UNSTABLE");
+  } else {
+    $("resultSubtitle").textContent = "The terminal has identified a likely resonance path.";
+    setHeader("RESULT // KYBER RECOMMENDATION", "COMPLETE");
+  }
+
+  go("p7");
 }
 
 function runLoadingSequence() {
@@ -178,6 +214,17 @@ function runLoadingSequence() {
     }
   ];
 
+  if (state.secretUnlocked) {
+    steps[1].text = "WARNING: anomalous silence detected…";
+    steps[1].lines = ["signal dropped to zero…", "reacquiring…", "do not interrupt…"];
+
+    steps[2].text = "Containment routines failing…";
+    steps[2].lines = ["lattice pressure rising…", "field destabilizing…", "hold steady…"];
+
+    steps[3].text = "Forcing recommendation…";
+    steps[3].lines = ["no match found…", "accepting void…", "transfer ready…"];
+  }
+
   const timer = setInterval(() => {
     progress += 6;
     if (progress > 100) progress = 100;
@@ -193,8 +240,10 @@ function runLoadingSequence() {
     loadText.textContent = step.text;
     loadLines.innerHTML = `&gt; ${step.lines[0]}<br />&gt; ${step.lines[1]}<br />&gt; ${step.lines[2]}`;
 
-    if (Math.random() < 0.2) {
-      staticGlitch();
+    if (state.secretUnlocked) {
+      if (Math.random() < 0.4) staticGlitch();
+    } else {
+      if (Math.random() < 0.18) staticGlitch();
     }
 
     if (progress >= 100) {
@@ -204,34 +253,11 @@ function runLoadingSequence() {
   }, 120);
 }
 
-function showResult() {
-  const color = state.secretUnlocked ? "Black" : scoreResult();
-  state.result = color;
-
-  const lore = getLore(color);
-
-  $("resultName").textContent = lore.title;
-  $("resultLore").textContent = lore.text;
-  $("glow").style.background = `radial-gradient(circle at 50% 30%, ${getGlow(color)}, transparent 62%)`;
-
-  if (color === "Black") {
-    $("resultSubtitle").textContent = "An anomaly answered the call.";
-    staticGlitch();
-    setTimeout(staticGlitch, 180);
-    setTimeout(staticGlitch, 320);
-  } else {
-    $("resultSubtitle").textContent = "The terminal has identified a likely resonance path.";
-  }
-
-  go("p7");
-  setHeader("RESULT // KYBER RECOMMENDATION", "COMPLETE");
-}
-
 function tryUnlockSecret() {
   if (
     state.secretDotClicks >= 3 &&
     state.secretSessionClicks >= 1 &&
-    state.secretRingPress
+    state.secretRingPress === true
   ) {
     $("hiddenPrompt").classList.remove("hidden");
     staticGlitch();
