@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kyber Attunement Terminal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="terminal">
+
+<h1>KYBER ATTUNEMENT TERMINAL</h1>
+<p class="subtitle">Insert or Select a Kyber Crystal</p>
+
+<div class="crystal-grid">
+
+<button class="crystal blue" onclick="attune('blue')">Blue</button>
+<button class="crystal green" onclick="attune('green')">Green</button>
+<button class="crystal red" onclick="attune('red')">Red</button>
+<button class="crystal purple" onclick="attune('purple')">Purple</button>
+<button class="crystal yellow" onclick="attune('yellow')">Yellow</button>
+<button class="crystal black" onclick="attune('black')">Black</button>
+
+</div>
+
+<div id="result"></div>
+
+<button id="reset" onclick="resetTerminal()">Reset</button>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
