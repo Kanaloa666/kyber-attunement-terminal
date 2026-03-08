@@ -17,6 +17,7 @@
         Batuu // Subsector 12<br />
         Kyber Handling Terminal
       </div>
+
       <div class="badge">
         SESSION: <span id="sessionId">—</span><br />
         LINK: NFC INITIATED
@@ -33,10 +34,12 @@
       </div>
 
       <div class="content">
-
+        <!-- PAGE 1 -->
         <section class="page" id="p1">
           <h1 class="h1">Initialize Force Attunement</h1>
-          <p class="sub">Place your hand over the chamber. Breathe once. Let Batuu fall away.</p>
+          <p class="sub">
+            Place your hand over the chamber. Breathe once. Let Batuu fall away.
+          </p>
 
           <div class="viz">
             <p class="label">SIGNAL // LOW-POWER RESONANCE</p>
@@ -50,7 +53,7 @@
           </div>
 
           <div class="hiddenPrompt hidden" id="hiddenPrompt">
-            <p class="small">
+            <p class="small promptText">
               SIGNAL BREAK // UNRESOLVED ECHO DETECTED<br />
               A silent frequency waits beneath the lattice.
             </p>
@@ -61,9 +64,12 @@
           </div>
         </section>
 
+        <!-- PAGE 2 -->
         <section class="page hidden" id="p2">
           <h1 class="h1">Resonance Detected</h1>
-          <p class="sub">The field is stable. Do not force the answer. Let instinct move first.</p>
+          <p class="sub">
+            The field is stable. Do not force the answer. Let instinct move first.
+          </p>
 
           <div class="viz">
             <p class="label">FIELD // HARMONIC LOCK</p>
@@ -78,6 +84,7 @@
           </div>
         </section>
 
+        <!-- PAGE 3 -->
         <section class="page hidden" id="p3">
           <h1 class="h1">Attunement I</h1>
           <p class="sub">When pressure rises, your first instinct is to…</p>
@@ -107,6 +114,7 @@
           </button>
         </section>
 
+        <!-- PAGE 4 -->
         <section class="page hidden" id="p4">
           <h1 class="h1">Attunement II</h1>
           <p class="sub">Power is best understood as…</p>
@@ -136,6 +144,7 @@
           </button>
         </section>
 
+        <!-- PAGE 5 -->
         <section class="page hidden" id="p5">
           <h1 class="h1">Attunement III</h1>
           <p class="sub">Your compass points toward…</p>
@@ -165,6 +174,7 @@
           </button>
         </section>
 
+        <!-- PAGE 6 -->
         <section class="page hidden" id="p6">
           <h1 class="h1">Calibrating Kyber Resonance</h1>
           <p class="sub" id="loadText">Sampling field harmonics…</p>
@@ -182,9 +192,12 @@
           </div>
         </section>
 
+        <!-- PAGE 7 -->
         <section class="page hidden" id="p7">
           <h1 class="h1">Attunement Complete</h1>
-          <p class="sub" id="resultSubtitle">The terminal has identified a likely resonance path.</p>
+          <p class="sub" id="resultSubtitle">
+            The terminal has identified a likely resonance path.
+          </p>
 
           <div class="resultBox">
             <div class="glow" id="glow"></div>
@@ -196,7 +209,6 @@
             <button class="primary" id="restartBtn">NEW ATTUNEMENT</button>
           </div>
         </section>
-
       </div>
     </div>
   </div>
