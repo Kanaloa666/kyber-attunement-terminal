@@ -1,37 +1,284 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kyber Attunement Terminal</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kyber Crystal Attunement // Black Spire Outpost</title>
+  <meta name="theme-color" content="#050607" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
+<body class="crt">
+  <div class="static" id="static"></div>
 
-<div id="terminal">
+  <!-- AUDIO -->
+  <audio id="startup" preload="auto">
+    <source src="audio/light-saber-startup.mp3" type="audio/mpeg">
+  </audio>
 
-<h1>KYBER ATTUNEMENT TERMINAL</h1>
-<p class="subtitle">Insert or Select a Kyber Crystal</p>
+  <audio id="hum" loop preload="auto">
+    <source src="audio/lightsaber-hum.mp3" type="audio/mpeg">
+  </audio>
 
-<div class="crystal-grid">
+  <audio id="lockin" preload="auto">
+    <source src="audio/deep-harmonic-tonal-whoosh.mp3" type="audio/mpeg">
+  </audio>
 
-<button class="crystal blue" onclick="attune('blue')">Blue</button>
-<button class="crystal green" onclick="attune('green')">Green</button>
-<button class="crystal red" onclick="attune('red')">Red</button>
-<button class="crystal purple" onclick="attune('purple')">Purple</button>
-<button class="crystal yellow" onclick="attune('yellow')">Yellow</button>
-<button class="crystal black" onclick="attune('black')">Black</button>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="badge">
+        <strong>BLACK SPIRE OUTPOST</strong><br/>
+        Batuu // Subsector 12<br/>
+        Kyber Handling Terminal
+      </div>
+      <div class="badge">
+        SESSION: <span id="sessionId">—</span><br/>
+        LINK: NFC INITIATED
+      </div>
+    </div>
 
-</div>
+    <div class="panel">
+      <div class="panelTop">
+        <p class="title" id="panelTitle">KYBER ATTUNEMENT PROTOCOL</p>
+        <div class="status"><span class="dot"></span><span id="panelStatus">STANDBY</span></div>
+      </div>
 
-<div id="result"></div>
+      <div class="content">
 
-<button id="reset" onclick="resetTerminal()">Reset</button>
+        <!-- PAGE 1 -->
+        <section class="page" id="p1">
+          <h1 class="h1">Initialize Force Attunement</h1>
+          <p class="sub">
+Place your hand over the chamber.
+Breathe once. Let Batuu fall away.</p>
 
-</div>
+          <div class="grid">
+            <div class="viz">
+              <p class="label">SIGNAL // LOW-POWER RESONANCE</p>
+              <div class="aura"></div>
+              <div class="ring" aria-hidden="true"></div>
+              <p class="tiny">NOTE: This terminal does not store identity. It only reads resonance.</p>
+            </div>
+          </div>
 
-<script src="script.js"></script>
+          <div class="btnRow">
+            <button class="primary" onclick="startSequence(); go(2, {glitch:true});">BEGIN</button>
+            <button class="ghost" onclick="softReset()">RESET</button>
+          </div>
+        </section>
 
+        <!-- PAGE 2 -->
+        <section class="page hidden" id="p2">
+          <h1 class="h1">Resonance Detected</h1>
+          <p class="sub">
+The Force resonates strongly.
+Do not chase it. Let it approach.</p>
+
+          <div class="grid">
+            <div class="viz">
+              <p class="label">FIELD // STABLE • HARMONIC</p>
+              <div class="aura"></div>
+              <div class="resonanceCard">
+                <div class="resonanceRow">
+                  <span>VECTOR DRIFT</span><span>±0.04</span>
+                </div>
+                <div class="driftWrap">
+                  <div id="drift" class="driftFill"></div>
+                </div>
+                <p class="tiny resonanceTiny">
+                  Choose what feels true—fast. The crystal listens to instinct.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button class="primary" onclick="go(3)">CONTINUE</button>
+            <button class="ghost" onclick="go(1)">BACK</button>
+          </div>
+        </section>
+
+        <!-- PAGE 3 -->
+        <section class="page hidden" id="p3">
+          <h1 class="h1">Attunement I</h1>
+          <p class="sub">When pressure rises, your first impulse is to…</p>
+
+          <div class="grid">
+            <div class="viz">
+              <p class="label">HOLO // CONFLICT TRACE</p>
+              <div class="ring" aria-hidden="true"></div>
+              <div class="tiny">Select one response.</div>
+            </div>
+
+            <button class="choice" onclick="answer('q1','protect')">
+              <span class="k"></span>
+              <span class="t"><strong>Protect</strong><span>Stand between danger and what matters.</span></span>
+            </button>
+
+            <button class="choice" onclick="answer('q1','observe')">
+              <span class="k"></span>
+              <span class="t"><strong>Observe</strong><span>Read the room. Map the threat. Then move.</span></span>
+            </button>
+
+            <button class="choice" onclick="answer('q1','act')">
+              <span class="k"></span>
+              <span class="t"><strong>Act</strong><span>Cut a path. Make momentum before it’s taken.</span></span>
+            </button>
+          </div>
+
+          <div class="btnRow">
+            <button class="ghost" onclick="go(2)">BACK</button>
+          </div>
+        </section>
+
+        <!-- PAGE 4 -->
+        <section class="page hidden" id="p4">
+          <h1 class="h1">Attunement II</h1>
+          <p class="sub">Power is best understood as…</p>
+
+          <div class="grid">
+            <div class="viz">
+              <p class="label">HOLO // OUTPUT SIGNATURE</p>
+              <div class="aura"></div>
+              <div class="columnSet">
+                <div class="col c1"></div>
+                <div class="col c2"></div>
+                <div class="col c3"></div>
+                <div class="col c4"></div>
+              </div>
+              <div class="tiny centerTiny">Select one response.</div>
+            </div>
+
+            <button class="choice" onclick="answer('q2','responsibility')">
+              <span class="k"></span>
+              <span class="t"><strong>Responsibility</strong><span>It must be carried, not flaunted.</span></span>
+            </button>
+
+            <button class="choice" onclick="answer('q2','tool')">
+              <span class="k"></span>
+              <span class="t"><strong>A Tool</strong><span>Useful. Neutral. Defined by the hand that holds it.</span></span>
+            </button>
+
+            <button class="choice" onclick="answer('q2','weapon')">
+              <span class="k"></span>
+              <span class="t"><strong>A Weapon</strong><span>Meant to be decisive. Meant to end things.</span></span>
+            </button>
+          </div>
+
+          <div class="btnRow">
+            <button class="ghost" onclick="go(3)">BACK</button>
+          </div>
+        </section>
+
+        <!-- PAGE 5 -->
+        <section class="page hidden" id="p5">
+          <h1 class="h1">Attunement III</h1>
+          <p class="sub">Your compass points toward…</p>
+
+          <div class="grid">
+            <div class="viz">
+              <p class="label">HOLO // PATH INDEX</p>
+              <div class="ring" aria-hidden="true"></div>
+              <div class="aura auraPad"></div>
+              <div class="tiny centerTiny">Select one response.</div>
+            </div>
+
+            <button class="choice" onclick="answer('q3','loyalty')">
+              <span class="k"></span>
+              <span class="t"><strong>Loyalty</strong><span>You don’t abandon your people.</span></span>
+            </button>
+
+            <button class="choice" onclick="answer('q3','knowledge')">
+              <span class="k"></span>
+              <span class="t"><strong>Knowledge</strong><span>Truth first. The rest follows.</span></span>
+            </button>
+
+            <button class="choice" onclick="answer('q3','freedom')">
+              <span class="k"></span>
+              <span class="t"><strong>Freedom</strong><span>Your path is yours—always.</span></span>
+            </button>
+          </div>
+
+          <div class="btnRow">
+            <button class="ghost" onclick="go(4)">BACK</button>
+          </div>
+        </section>
+
+        <!-- PAGE 6 -->
+        <section class="page hidden" id="p6">
+          <h1 class="h1">Calibrating Kyber Resonance</h1>
+          <p class="sub" id="loadText">Sampling field harmonics…</p>
+
+          <div class="grid">
+            <div class="viz">
+              <p class="label">ANALYSIS // RUNNING</p>
+              <div class="bar"><div id="barFill"></div></div>
+              <p class="tiny loadLines" id="loadLines">
+                &gt; establishing baseline…<br/>
+                &gt; correcting drift…<br/>
+                &gt; isolating signature…
+              </p>
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button class="ghost" onclick="softReset()">ABORT</button>
+          </div>
+        </section>
+
+        <!-- PAGE 7 -->
+        <section class="page hidden" id="p7">
+          <h1 class="h1">Attunement Complete</h1>
+          <p class="sub" id="resultSubtitle">The terminal has a recommendation. The choice is still yours.</p>
+
+          <div class="grid">
+            <div class="resultBox" id="resultBox">
+              <div class="glow" id="glow"></div>
+              <p class="big" id="resultName">—</p>
+              <p class="small" id="resultLore">—</p>
+            </div>
+
+            <div class="viz">
+              <p class="label">FINAL // TRANSFER PROTOCOL</p>
+              <div class="aura"></div>
+              <p class="tiny resultTiny">
+                Present the chamber. Receive the crystal.
+              </p>
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button class="primary" onclick="accept()">ACCEPT ALIGNMENT</button>
+            <button class="ghost" onclick="toggleOverride(true)">If you feel the Force was mistaken today…</button>
+            <button class="ghost" onclick="softReset()">NEW ATTUNEMENT</button>
+          </div>
+
+          <div class="grid hidden overrideGrid" id="overridePanel">
+            <div class="resultBox">
+              <p class="big overrideTitle">Pick from Available Stockpile</p>
+              <p class="small overrideText">
+                Sometimes the field is noisy. Choose what calls to you—no judgment.
+              </p>
+
+              <div class="btnRow overrideButtons">
+                <button onclick="manualPick('Yellow')">Yellow</button>
+                <button onclick="manualPick('Blue')">Blue</button>
+                <button onclick="manualPick('Green')">Green</button>
+                <button onclick="manualPick('Red')">Red</button>
+                <button class="ghost" onclick="toggleOverride(false)">Never mind</button>
+              </div>
+
+              <p class="tiny overrideNote">
+                NOTE: Black is not listed. If it appears, it’s a true anomaly.
+              </p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
