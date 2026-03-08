@@ -5,9 +5,551 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Kyber Crystal Attunement // Black Spire Outpost</title>
   <meta name="theme-color" content="#050607" />
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    :root{
+      --bg:#050607;
+      --bg2:#081018;
+      --panel:#0c0f12;
+      --panel2:rgba(12,15,18,0.78);
+      --text:#e7e7e7;
+      --muted:#9aa6b2;
+      --line:#1b2530;
+      --accent:#4ad3ff;
+      --amber:#d69a3d;
+      --blue:#4aa3ff;
+      --green:#44ff8a;
+      --red:#ff4a4a;
+      --yellow:#ffd24a;
+      --black:#8a8a8a;
+    }
+
+    *{ box-sizing:border-box; }
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      background:
+        radial-gradient(1100px 700px at 50% -20%, #0b1a26 0%, var(--bg) 55%) fixed,
+        radial-gradient(900px 500px at 120% 30%, rgba(74,211,255,0.06) 0%, transparent 55%) fixed,
+        linear-gradient(180deg, #030507 0%, #050607 100%);
+      color:var(--text);
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      letter-spacing:.2px;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.025) 0px,
+          rgba(255,255,255,0.025) 1px,
+          rgba(0,0,0,0) 2px,
+          rgba(0,0,0,0) 4px
+        );
+      mix-blend-mode:overlay;
+      opacity:.28;
+      z-index:10;
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(1200px 700px at 50% 20%, transparent 0%, rgba(0,0,0,.38) 70%),
+        radial-gradient(700px 400px at 50% 120%, rgba(214,154,61,.03), transparent 60%);
+      z-index:10;
+    }
+
+    .dust{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.12;
+      z-index:1;
+      background-image:
+        radial-gradient(circle at 15% 25%, rgba(214,154,61,.22) 0 1px, transparent 2px),
+        radial-gradient(circle at 75% 45%, rgba(255,255,255,.18) 0 1px, transparent 2px),
+        radial-gradient(circle at 55% 80%, rgba(214,154,61,.18) 0 1px, transparent 2px),
+        radial-gradient(circle at 85% 15%, rgba(255,255,255,.12) 0 1px, transparent 2px);
+      background-size: 240px 240px, 300px 300px, 220px 220px, 280px 280px;
+    }
+
+    .static{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:999;
+      opacity:0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,.02) 0px,
+          rgba(255,255,255,.02) 1px,
+          rgba(0,0,0,0) 2px,
+          rgba(0,0,0,0) 5px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.01) 0px,
+          rgba(255,255,255,.01) 1px,
+          rgba(0,0,0,0) 2px,
+          rgba(0,0,0,0) 6px
+        );
+      mix-blend-mode:overlay;
+    }
+
+    .static.on{
+      opacity:.8;
+      animation:staticBurst 420ms steps(2) 1;
+    }
+
+    @keyframes staticBurst{
+      0%{ transform:translate(0,0); filter:blur(0); }
+      20%{ transform:translate(-2px,1px); filter:blur(.2px); }
+      40%{ transform:translate(2px,-1px); filter:blur(.3px); }
+      60%{ transform:translate(-1px,-2px); filter:blur(.2px); }
+      100%{ transform:translate(0,0); filter:blur(0); }
+    }
+
+    .wrap{
+      position:relative;
+      z-index:2;
+      max-width:840px;
+      margin:0 auto;
+      padding:22px 16px 44px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+
+    .badge{
+      min-width:160px;
+      border:1px solid rgba(74,211,255,.18);
+      border-radius:14px;
+      padding:10px 12px;
+      background:
+        linear-gradient(180deg, rgba(14,20,25,.86), rgba(7,10,13,.72));
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.3;
+      box-shadow:
+        0 10px 22px rgba(0,0,0,.28),
+        inset 0 0 0 1px rgba(255,255,255,.015);
+    }
+
+    .badge strong{
+      color:var(--text);
+      letter-spacing:.4px;
+    }
+
+    .badge.clickable{
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .panel{
+      border:1px solid rgba(74,211,255,.16);
+      border-radius:20px;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg, rgba(12,15,18,.82), rgba(5,8,11,.82));
+      box-shadow:
+        0 16px 42px rgba(0,0,0,.38),
+        inset 0 0 0 1px rgba(255,255,255,.01);
+      position:relative;
+    }
+
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(214,154,61,.02), transparent 22%, transparent 78%, rgba(214,154,61,.02));
+      opacity:.7;
+    }
+
+    .panelTop{
+      padding:14px 16px;
+      border-bottom:1px solid rgba(74,211,255,.12);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      background:
+        linear-gradient(180deg, rgba(17,25,32,.85), rgba(10,13,16,.55));
+    }
+
+    .title{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      letter-spacing:.3px;
+    }
+
+    .status{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--accent);
+      box-shadow:0 0 16px rgba(74,211,255,.75);
+      animation:pulse 1.6s ease-in-out infinite;
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+
+    @keyframes pulse{
+      0%,100%{ transform:scale(1); opacity:.55; }
+      50%{ transform:scale(1.25); opacity:1; }
+    }
+
+    .content{
+      padding:18px 16px 16px;
+    }
+
+    .page.hidden{
+      display:none !important;
+    }
+
+    .h1{
+      margin:0 0 10px;
+      font-size:20px;
+      letter-spacing:.4px;
+    }
+
+    .sub{
+      margin:0 0 14px;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.6;
+      max-width:70ch;
+    }
+
+    .viz{
+      position:relative;
+      overflow:hidden;
+      min-height:178px;
+      border:1px solid rgba(74,211,255,.16);
+      border-radius:18px;
+      padding:14px 12px;
+      background:
+        radial-gradient(600px 220px at 50% 0%, rgba(74,211,255,.09), transparent 65%),
+        linear-gradient(180deg, rgba(5,9,12,.72), rgba(4,7,10,.58));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.01);
+    }
+
+    .viz::after{
+      content:"";
+      position:absolute;
+      top:-30%;
+      left:-38%;
+      width:40%;
+      height:180%;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.055), transparent);
+      transform:rotate(18deg);
+      animation:sweep 3.8s ease-in-out infinite;
+      opacity:.75;
+      pointer-events:none;
+    }
+
+    @keyframes sweep{
+      0%,40%{ transform:translateX(-50%) rotate(18deg); opacity:0; }
+      55%{ opacity:.8; }
+      100%{ transform:translateX(390%) rotate(18deg); opacity:0; }
+    }
+
+    .label{
+      margin:0 0 10px;
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.2px;
+    }
+
+    .aura{
+      height:10px;
+      border-radius:999px;
+      background:linear-gradient(90deg, rgba(74,211,255,0), rgba(74,211,255,.58), rgba(74,211,255,0));
+      box-shadow:0 0 18px rgba(74,211,255,.18);
+      animation:auraPulse 1.9s ease-in-out infinite;
+    }
+
+    @keyframes auraPulse{
+      0%,100%{ transform:scaleX(.82); opacity:.45; }
+      50%{ transform:scaleX(1.03); opacity:.95; }
+    }
+
+    .ring{
+      width:96px;
+      height:96px;
+      margin:18px auto 0;
+      border-radius:50%;
+      border:1px solid rgba(74,211,255,.35);
+      box-shadow:
+        0 0 22px rgba(74,211,255,.16),
+        inset 0 0 22px rgba(74,211,255,.14);
+      position:relative;
+      animation:ringSpin 5.5s linear infinite;
+      cursor:pointer;
+    }
+
+    .ring::before{
+      content:"";
+      position:absolute;
+      inset:10px;
+      border-radius:50%;
+      border:1px dashed rgba(74,211,255,.35);
+    }
+
+    .ring::after{
+      content:"";
+      position:absolute;
+      inset:26px;
+      border-radius:50%;
+      border:1px solid rgba(74,211,255,.2);
+      background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.06), transparent 60%);
+    }
+
+    @keyframes ringSpin{
+      to{ transform:rotate(360deg); }
+    }
+
+    .tiny{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.55;
+    }
+
+    .btnRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    button{
+      appearance:none;
+      border:1px solid rgba(74,211,255,.16);
+      background:rgba(7,10,12,.48);
+      color:var(--text);
+      padding:11px 13px;
+      border-radius:14px;
+      cursor:pointer;
+      font:inherit;
+      font-size:13px;
+      transition:border-color .18s ease, transform .08s ease, box-shadow .18s ease, background .18s ease;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.01);
+    }
+
+    button:hover{
+      border-color:rgba(74,211,255,.5);
+      box-shadow:0 0 0 2px rgba(74,211,255,.06) inset;
+    }
+
+    button:active{
+      transform:translateY(1px);
+    }
+
+    .primary{
+      border-color:rgba(74,211,255,.42);
+      box-shadow:0 0 0 2px rgba(74,211,255,.08) inset;
+    }
+
+    .ghost{
+      color:var(--muted);
+      background:transparent;
+    }
+
+    .choice{
+      width:100%;
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      text-align:left;
+      margin-bottom:12px;
+      border-radius:16px;
+      padding:12px;
+    }
+
+    .choice .k{
+      width:18px;
+      height:18px;
+      flex:0 0 auto;
+      border-radius:6px;
+      border:1px solid rgba(74,211,255,.14);
+      background:rgba(255,255,255,.03);
+      margin-top:2px;
+      box-shadow:0 0 0 2px rgba(0,0,0,.24) inset;
+    }
+
+    .choice .t{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+      min-width:0;
+    }
+
+    .choice .t strong{
+      font-weight:700;
+      color:var(--text);
+    }
+
+    .choice .t span{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.38;
+    }
+
+    .bar{
+      width:100%;
+      height:12px;
+      border:1px solid rgba(74,211,255,.14);
+      border-radius:999px;
+      overflow:hidden;
+      background:rgba(0,0,0,.34);
+      margin-top:6px;
+    }
+
+    .bar > div{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, rgba(74,211,255,.22), rgba(74,211,255,.78));
+      box-shadow:0 0 18px rgba(74,211,255,.18);
+      transition:width 120ms linear;
+    }
+
+    .resultBox{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(74,211,255,.14);
+      border-radius:18px;
+      background:rgba(0,0,0,.24);
+      padding:14px 12px;
+      min-height:146px;
+    }
+
+    .glow{
+      position:absolute;
+      inset:-70px;
+      opacity:.22;
+      filter:blur(10px);
+      pointer-events:none;
+      background:radial-gradient(circle at 50% 30%, var(--blue), transparent 62%);
+    }
+
+    .big{
+      position:relative;
+      z-index:1;
+      margin:0 0 6px;
+      font-size:22px;
+      line-height:1.2;
+      letter-spacing:.5px;
+      white-space:pre-line;
+    }
+
+    .small{
+      position:relative;
+      z-index:1;
+      margin:0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.6;
+      white-space:pre-line;
+    }
+
+    .hiddenPrompt{
+      margin-top:16px;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:14px 12px;
+      background:rgba(0,0,0,.35);
+    }
+
+    .idleBox{
+      border:1px solid rgba(214,154,61,.12);
+      border-radius:16px;
+      padding:12px;
+      margin-top:14px;
+      background:rgba(214,154,61,.03);
+    }
+
+    .idleLine{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+      margin:3px 0;
+    }
+
+    .idleLine .accent{
+      color:var(--amber);
+    }
+
+    .clickable{
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    @media (max-width:700px){
+      .topbar{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .badge{
+        width:100%;
+      }
+
+      .panelTop{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .status{
+        white-space:normal;
+      }
+
+      .btnRow{
+        flex-direction:column;
+      }
+
+      .btnRow button{
+        width:100%;
+      }
+
+      .big{
+        font-size:19px;
+      }
+    }
+  </style>
 </head>
-<body class="crt">
+<body>
+  <div class="dust"></div>
   <div class="static" id="static"></div>
 
   <div class="wrap">
@@ -18,7 +560,7 @@
         Kyber Handling Terminal
       </div>
 
-      <div class="badge">
+      <div class="badge clickable" id="sessionBadge">
         SESSION: <span id="sessionId">—</span><br />
         LINK: NFC INITIATED
       </div>
@@ -34,8 +576,42 @@
       </div>
 
       <div class="content">
+        <!-- IDLE PAGE -->
+        <section class="page" id="idlePage">
+          <h1 class="h1">Black Spire Node Online</h1>
+          <p class="sub">
+            Kyber handling terminal active. Awaiting resonance.
+          </p>
+
+          <div class="viz">
+            <p class="label">OUTPOST // STANDBY FIELD</p>
+            <div class="aura"></div>
+            <div class="ring" id="idleRing"></div>
+            <div class="idleBox">
+              <div class="idleLine"><span class="accent">&gt;</span> field ready</div>
+              <div class="idleLine"><span class="accent">&gt;</span> lattice stable</div>
+              <div class="idleLine"><span class="accent">&gt;</span> tap begin to start attunement</div>
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button class="primary" id="beginBtn">BEGIN ATTUNEMENT</button>
+          </div>
+
+          <div class="hiddenPrompt hidden" id="hiddenPrompt">
+            <p class="small">
+              SIGNAL BREAK // UNRESOLVED ECHO DETECTED<br />
+              A silent frequency waits beneath the lattice.
+            </p>
+            <div class="btnRow">
+              <button class="primary" id="blackAcceptBtn">LISTEN</button>
+              <button id="blackDeclineBtn">IGNORE</button>
+            </div>
+          </div>
+        </section>
+
         <!-- PAGE 1 -->
-        <section class="page" id="p1">
+        <section class="page hidden" id="p1">
           <h1 class="h1">Initialize Force Attunement</h1>
           <p class="sub">
             Place your hand over the chamber. Breathe once. Let Batuu fall away.
@@ -49,18 +625,8 @@
           </div>
 
           <div class="btnRow">
-            <button class="primary" id="beginBtn">BEGIN</button>
-          </div>
-
-          <div class="hiddenPrompt hidden" id="hiddenPrompt">
-            <p class="small promptText">
-              SIGNAL BREAK // UNRESOLVED ECHO DETECTED<br />
-              A silent frequency waits beneath the lattice.
-            </p>
-            <div class="btnRow">
-              <button class="primary" id="blackAcceptBtn">LISTEN</button>
-              <button id="blackDeclineBtn">IGNORE</button>
-            </div>
+            <button class="primary" id="toResonanceBtn">CONTINUE</button>
+            <button class="ghost" id="backToIdleBtn">BACK</button>
           </div>
         </section>
 
@@ -80,7 +646,7 @@
 
           <div class="btnRow">
             <button class="primary" id="toQ1Btn">CONTINUE</button>
-            <button id="backToStartBtn">BACK</button>
+            <button class="ghost" id="backToStartBtn">BACK</button>
           </div>
         </section>
 
@@ -213,6 +779,365 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const state = {
+      answers: {
+        q1: null,
+        q2: null,
+        q3: null
+      },
+      secretUnlocked: false,
+      secretDotClicks: 0,
+      secretSessionClicks: 0,
+      secretRingPress: false,
+      result: null
+    };
+
+    function staticGlitch() {
+      const el = $("static");
+      el.classList.remove("on");
+      void el.offsetWidth;
+      el.classList.add("on");
+      setTimeout(() => el.classList.remove("on"), 500);
+    }
+
+    function go(pageId) {
+      document.querySelectorAll(".page").forEach((page) => {
+        page.classList.add("hidden");
+      });
+
+      const target = $(pageId);
+      if (target) target.classList.remove("hidden");
+    }
+
+    function randId() {
+      const a = Math.random().toString(36).slice(2, 6).toUpperCase();
+      const b = Math.random().toString(36).slice(2, 6).toUpperCase();
+      return `BSP-${a}${b}`;
+    }
+
+    function resetState() {
+      state.answers = { q1: null, q2: null, q3: null };
+      state.secretUnlocked = false;
+      state.secretDotClicks = 0;
+      state.secretSessionClicks = 0;
+      state.secretRingPress = false;
+      state.result = null;
+      $("hiddenPrompt").classList.add("hidden");
+    }
+
+    function setHeader(title, status) {
+      $("panelTitle").textContent = title;
+      $("panelStatus").textContent = status;
+    }
+
+    function scoreResult() {
+      const scores = {
+        Yellow: 0,
+        Blue: 0,
+        Green: 0,
+        Red: 0
+      };
+
+      const q1 = state.answers.q1;
+      const q2 = state.answers.q2;
+      const q3 = state.answers.q3;
+
+      if (q1 === "protect") {
+        scores.Blue += 3;
+        scores.Green += 1;
+      }
+      if (q1 === "observe") {
+        scores.Green += 3;
+        scores.Yellow += 1;
+      }
+      if (q1 === "act") {
+        scores.Red += 3;
+        scores.Yellow += 1;
+      }
+
+      if (q2 === "responsibility") {
+        scores.Blue += 3;
+        scores.Green += 1;
+      }
+      if (q2 === "tool") {
+        scores.Yellow += 3;
+        scores.Green += 1;
+      }
+      if (q2 === "weapon") {
+        scores.Red += 3;
+        scores.Yellow += 1;
+      }
+
+      if (q3 === "loyalty") {
+        scores.Blue += 3;
+        scores.Green += 1;
+      }
+      if (q3 === "knowledge") {
+        scores.Green += 3;
+        scores.Yellow += 1;
+      }
+      if (q3 === "freedom") {
+        scores.Yellow += 3;
+        scores.Red += 1;
+      }
+
+      let bestColor = "Yellow";
+      let bestScore = -1;
+
+      ["Yellow", "Blue", "Green", "Red"].forEach((color) => {
+        if (scores[color] > bestScore) {
+          bestScore = scores[color];
+          bestColor = color;
+        }
+      });
+
+      return bestColor;
+    }
+
+    function getLore(color) {
+      const lore = {
+        Yellow: {
+          title: "YELLOW — The Choice of the True",
+          text: "Clarity without cruelty. Purpose without noise.\nYou move with intent—and Batuu doesn’t miss it."
+        },
+        Blue: {
+          title: "BLUE — The Oath of the Guardian",
+          text: "You stand when others step back.\nThe crystal answers your steadiness, like a beacon through dust storms."
+        },
+        Green: {
+          title: "GREEN — The Quiet Current",
+          text: "Patience is not hesitation. Wisdom is not softness.\nYour resonance is steady—like stone warmed by twin suns."
+        },
+        Red: {
+          title: "RED — The Claim of Power",
+          text: "The field sharpens around you.\nIt does not ask permission. It waits to see if you will take what you want."
+        },
+        Black: {
+          title: "BLACK — The Void Answered",
+          text: "A silence behind the signal.\nSomething ancient stirs in the lattice.\nKeep your grip—Batuu remembers what it feeds."
+        }
+      };
+
+      return lore[color];
+    }
+
+    function getGlow(color) {
+      const map = {
+        Yellow: "#ffd24a",
+        Blue: "#4aa3ff",
+        Green: "#44ff8a",
+        Red: "#ff4a4a",
+        Black: "#8a8a8a"
+      };
+
+      return map[color] || "#4aa3ff";
+    }
+
+    function showResult() {
+      const color = state.secretUnlocked ? "Black" : scoreResult();
+      state.result = color;
+
+      const lore = getLore(color);
+
+      $("resultName").textContent = lore.title;
+      $("resultLore").textContent = lore.text;
+      $("glow").style.background = `radial-gradient(circle at 50% 30%, ${getGlow(color)}, transparent 62%)`;
+
+      if (color === "Black") {
+        $("resultSubtitle").textContent = "An anomaly answered the call.";
+        staticGlitch();
+        setTimeout(staticGlitch, 180);
+        setTimeout(staticGlitch, 320);
+        setHeader("RESULT // ANOMALY DETECTED", "UNSTABLE");
+      } else {
+        $("resultSubtitle").textContent = "The terminal has identified a likely resonance path.";
+        setHeader("RESULT // KYBER RECOMMENDATION", "COMPLETE");
+      }
+
+      go("p7");
+    }
+
+    function runLoadingSequence() {
+      go("p6");
+      setHeader("CALIBRATION // ANALYSIS", "RUNNING");
+
+      const bar = $("barFill");
+      const loadText = $("loadText");
+      const loadLines = $("loadLines");
+
+      let progress = 0;
+
+      const steps = [
+        {
+          text: "Sampling field harmonics…",
+          lines: ["establishing baseline…", "correcting drift…", "isolating signature…"]
+        },
+        {
+          text: "Filtering atmospheric interference…",
+          lines: ["shielding coils…", "phase matching…", "rejecting noise…"]
+        },
+        {
+          text: "Aligning kyber lattice…",
+          lines: ["harmonics stabilized…", "signal lock acquired…", "final comparison…"]
+        },
+        {
+          text: "Finalizing recommendation…",
+          lines: ["mapping signature…", "confirming output…", "transfer ready…"]
+        }
+      ];
+
+      if (state.secretUnlocked) {
+        steps[1].text = "WARNING: anomalous silence detected…";
+        steps[1].lines = ["signal dropped to zero…", "reacquiring…", "do not interrupt…"];
+
+        steps[2].text = "Containment routines failing…";
+        steps[2].lines = ["lattice pressure rising…", "field destabilizing…", "hold steady…"];
+
+        steps[3].text = "Forcing recommendation…";
+        steps[3].lines = ["no match found…", "accepting void…", "transfer ready…"];
+      }
+
+      const timer = setInterval(() => {
+        progress += 6;
+        if (progress > 100) progress = 100;
+
+        bar.style.width = `${progress}%`;
+
+        let stepIndex = 0;
+        if (progress > 25) stepIndex = 1;
+        if (progress > 50) stepIndex = 2;
+        if (progress > 75) stepIndex = 3;
+
+        const step = steps[stepIndex];
+        loadText.textContent = step.text;
+        loadLines.innerHTML = `&gt; ${step.lines[0]}<br />&gt; ${step.lines[1]}<br />&gt; ${step.lines[2]}`;
+
+        if (state.secretUnlocked) {
+          if (Math.random() < 0.40) staticGlitch();
+        } else {
+          if (Math.random() < 0.18) staticGlitch();
+        }
+
+        if (progress >= 100) {
+          clearInterval(timer);
+          setTimeout(showResult, 500);
+        }
+      }, 120);
+    }
+
+    function tryUnlockSecret() {
+      if (
+        state.secretDotClicks >= 3 &&
+        state.secretSessionClicks >= 1 &&
+        state.secretRingPress === true
+      ) {
+        $("hiddenPrompt").classList.remove("hidden");
+        staticGlitch();
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      $("sessionId").textContent = randId();
+
+      go("idlePage");
+      setHeader("KYBER ATTUNEMENT PROTOCOL", "STANDBY");
+
+      $("beginBtn").addEventListener("click", () => {
+        staticGlitch();
+        go("p1");
+        setHeader("ATTUNEMENT // INITIALIZATION", "READY");
+      });
+
+      $("toResonanceBtn").addEventListener("click", () => {
+        staticGlitch();
+        go("p2");
+        setHeader("RESONANCE FIELD MONITOR", "LOCKED");
+      });
+
+      $("backToIdleBtn").addEventListener("click", () => {
+        staticGlitch();
+        go("idlePage");
+        setHeader("KYBER ATTUNEMENT PROTOCOL", "STANDBY");
+      });
+
+      $("toQ1Btn").addEventListener("click", () => {
+        staticGlitch();
+        go("p3");
+        setHeader("ATTUNEMENT // PHASE I", "INPUT REQUIRED");
+      });
+
+      $("backToStartBtn").addEventListener("click", () => {
+        staticGlitch();
+        go("p1");
+        setHeader("ATTUNEMENT // INITIALIZATION", "READY");
+      });
+
+      document.querySelectorAll(".choice").forEach((button) => {
+        button.addEventListener("click", () => {
+          const question = button.dataset.q;
+          const answer = button.dataset.a;
+
+          state.answers[question] = answer;
+          staticGlitch();
+
+          if (question === "q1") {
+            go("p4");
+            setHeader("ATTUNEMENT // PHASE II", "INPUT REQUIRED");
+          } else if (question === "q2") {
+            go("p5");
+            setHeader("ATTUNEMENT // PHASE III", "INPUT REQUIRED");
+          } else if (question === "q3") {
+            runLoadingSequence();
+          }
+        });
+      });
+
+      $("restartBtn").addEventListener("click", () => {
+        staticGlitch();
+        resetState();
+        $("sessionId").textContent = randId();
+        go("idlePage");
+        setHeader("KYBER ATTUNEMENT PROTOCOL", "STANDBY");
+      });
+
+      $("statusDot").addEventListener("click", () => {
+        state.secretDotClicks += 1;
+        staticGlitch();
+        tryUnlockSecret();
+      });
+
+      $("sessionBadge").addEventListener("click", () => {
+        state.secretSessionClicks += 1;
+        staticGlitch();
+        tryUnlockSecret();
+      });
+
+      $("idleRing").addEventListener("mousedown", () => {
+        state.secretRingPress = true;
+        tryUnlockSecret();
+      });
+
+      $("idleRing").addEventListener("touchstart", () => {
+        state.secretRingPress = true;
+        tryUnlockSecret();
+      });
+
+      $("blackAcceptBtn").addEventListener("click", () => {
+        state.secretUnlocked = true;
+        $("hiddenPrompt").classList.add("hidden");
+        staticGlitch();
+        go("p1");
+        setHeader("ATTUNEMENT // INITIALIZATION", "ANOMALY LOCKED");
+      });
+
+      $("blackDeclineBtn").addEventListener("click", () => {
+        $("hiddenPrompt").classList.add("hidden");
+        staticGlitch();
+      });
+    });
+  </script>
 </body>
 </html>
