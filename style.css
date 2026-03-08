@@ -1,284 +1,561 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kyber Crystal Attunement // Black Spire Outpost</title>
-  <meta name="theme-color" content="#050607" />
-  <link rel="stylesheet" href="style.css" />
-</head>
+:root{
+  --bg:#050607;
+  --panel:#0c0f12;
+  --text:#e7e7e7;
+  --muted:#9aa6b2;
+  --line:#1b2530;
+  --accent:#4ad3ff;
 
-<body class="crt">
-  <div class="static" id="static"></div>
+  --c-green:#44ff8a;
+  --c-blue:#4aa3ff;
+  --c-red:#ff4a4a;
+  --c-yellow:#ffd24a;
+  --c-black:#0b0b10;
+}
 
-  <!-- AUDIO -->
-  <audio id="startup" preload="auto">
-    <source src="audio/light-saber-startup.mp3" type="audio/mpeg">
-  </audio>
+*{box-sizing:border-box}
 
-  <audio id="hum" loop preload="auto">
-    <source src="audio/lightsaber-hum.mp3" type="audio/mpeg">
-  </audio>
+body{
+  margin:0;
+  font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background:
+    radial-gradient(1100px 700px at 50% -20%, #0b1a26 0%, var(--bg) 55%) fixed,
+    radial-gradient(900px 500px at 120% 30%, rgba(74,211,255,0.06) 0%, transparent 55%) fixed;
+  color:var(--text);
+  letter-spacing:0.2px;
+  overflow-x:hidden;
+}
 
-  <audio id="lockin" preload="auto">
-    <source src="audio/deep-harmonic-tonal-whoosh.mp3" type="audio/mpeg">
-  </audio>
+/* CRT scanlines + vignette */
+.crt::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 1px,
+      rgba(0,0,0,0.00) 2px,
+      rgba(0,0,0,0.00) 4px
+    );
+  mix-blend-mode:overlay;
+  opacity:0.35;
+}
 
-  <div class="wrap">
-    <div class="topbar">
-      <div class="badge">
-        <strong>BLACK SPIRE OUTPOST</strong><br/>
-        Batuu // Subsector 12<br/>
-        Kyber Handling Terminal
-      </div>
-      <div class="badge">
-        SESSION: <span id="sessionId">—</span><br/>
-        LINK: NFC INITIATED
-      </div>
-    </div>
+.crt::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(900px 500px at 50% 20%, transparent 0%, rgba(0,0,0,0.55) 70%);
+  opacity:0.7;
+}
 
-    <div class="panel">
-      <div class="panelTop">
-        <p class="title" id="panelTitle">KYBER ATTUNEMENT PROTOCOL</p>
-        <div class="status"><span class="dot"></span><span id="panelStatus">STANDBY</span></div>
-      </div>
+.wrap{
+  max-width:820px;
+  margin:0 auto;
+  padding:24px 16px 44px;
+  position:relative;
+  z-index:1;
+}
 
-      <div class="content">
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:12px;
+}
 
-        <!-- PAGE 1 -->
-        <section class="page" id="p1">
-          <h1 class="h1">Initialize Force Attunement</h1>
-          <p class="sub">
-Place your hand over the chamber.
-Breathe once. Let Batuu fall away.</p>
+.badge{
+  border:1px solid var(--line);
+  padding:8px 10px;
+  border-radius:14px;
+  background:rgba(12,15,18,0.65);
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.25;
+  width:fit-content;
+}
 
-          <div class="grid">
-            <div class="viz">
-              <p class="label">SIGNAL // LOW-POWER RESONANCE</p>
-              <div class="aura"></div>
-              <div class="ring" aria-hidden="true"></div>
-              <p class="tiny">NOTE: This terminal does not store identity. It only reads resonance.</p>
-            </div>
-          </div>
+.badge strong{
+  color:var(--text);
+  font-weight:700;
+}
 
-          <div class="btnRow">
-            <button class="primary" onclick="startSequence(); go(2, {glitch:true});">BEGIN</button>
-            <button class="ghost" onclick="softReset()">RESET</button>
-          </div>
-        </section>
+.panel{
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:rgba(12,15,18,0.72);
+  box-shadow:0 12px 34px rgba(0,0,0,0.36);
+  overflow:hidden;
+  position:relative;
+}
 
-        <!-- PAGE 2 -->
-        <section class="page hidden" id="p2">
-          <h1 class="h1">Resonance Detected</h1>
-          <p class="sub">
-The Force resonates strongly.
-Do not chase it. Let it approach.</p>
+.panelTop{
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:linear-gradient(180deg, rgba(19,27,36,0.75), rgba(12,15,18,0.35));
+}
 
-          <div class="grid">
-            <div class="viz">
-              <p class="label">FIELD // STABLE • HARMONIC</p>
-              <div class="aura"></div>
-              <div class="resonanceCard">
-                <div class="resonanceRow">
-                  <span>VECTOR DRIFT</span><span>±0.04</span>
-                </div>
-                <div class="driftWrap">
-                  <div id="drift" class="driftFill"></div>
-                </div>
-                <p class="tiny resonanceTiny">
-                  Choose what feels true—fast. The crystal listens to instinct.
-                </p>
-              </div>
-            </div>
-          </div>
+.title{
+  font-size:14px;
+  margin:0;
+  color:var(--muted);
+}
 
-          <div class="btnRow">
-            <button class="primary" onclick="go(3)">CONTINUE</button>
-            <button class="ghost" onclick="go(1)">BACK</button>
-          </div>
-        </section>
+.status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+}
 
-        <!-- PAGE 3 -->
-        <section class="page hidden" id="p3">
-          <h1 class="h1">Attunement I</h1>
-          <p class="sub">When pressure rises, your first impulse is to…</p>
+.dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 16px rgba(74,211,255,0.75);
+  animation:pulse 1.6s ease-in-out infinite;
+}
 
-          <div class="grid">
-            <div class="viz">
-              <p class="label">HOLO // CONFLICT TRACE</p>
-              <div class="ring" aria-hidden="true"></div>
-              <div class="tiny">Select one response.</div>
-            </div>
+@keyframes pulse{
+  0%,100%{ transform:scale(1); opacity:0.55; }
+  50%{ transform:scale(1.25); opacity:1; }
+}
 
-            <button class="choice" onclick="answer('q1','protect')">
-              <span class="k"></span>
-              <span class="t"><strong>Protect</strong><span>Stand between danger and what matters.</span></span>
-            </button>
+.content{
+  padding:18px 16px 16px;
+}
 
-            <button class="choice" onclick="answer('q1','observe')">
-              <span class="k"></span>
-              <span class="t"><strong>Observe</strong><span>Read the room. Map the threat. Then move.</span></span>
-            </button>
+.h1{
+  margin:0 0 8px;
+  font-size:20px;
+  letter-spacing:0.4px;
+}
 
-            <button class="choice" onclick="answer('q1','act')">
-              <span class="k"></span>
-              <span class="t"><strong>Act</strong><span>Cut a path. Make momentum before it’s taken.</span></span>
-            </button>
-          </div>
+.sub{
+  margin:0 0 14px;
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.55;
+  white-space:pre-line;
+}
 
-          <div class="btnRow">
-            <button class="ghost" onclick="go(2)">BACK</button>
-          </div>
-        </section>
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
 
-        <!-- PAGE 4 -->
-        <section class="page hidden" id="p4">
-          <h1 class="h1">Attunement II</h1>
-          <p class="sub">Power is best understood as…</p>
+.btnRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
 
-          <div class="grid">
-            <div class="viz">
-              <p class="label">HOLO // OUTPUT SIGNATURE</p>
-              <div class="aura"></div>
-              <div class="columnSet">
-                <div class="col c1"></div>
-                <div class="col c2"></div>
-                <div class="col c3"></div>
-                <div class="col c4"></div>
-              </div>
-              <div class="tiny centerTiny">Select one response.</div>
-            </div>
+button{
+  border:1px solid var(--line);
+  background:rgba(7,10,12,0.45);
+  color:var(--text);
+  padding:11px 12px;
+  border-radius:14px;
+  cursor:pointer;
+  transition:transform .06s ease, border-color .2s ease, background .2s ease;
+  font:inherit;
+  font-size:13px;
+}
 
-            <button class="choice" onclick="answer('q2','responsibility')">
-              <span class="k"></span>
-              <span class="t"><strong>Responsibility</strong><span>It must be carried, not flaunted.</span></span>
-            </button>
+button:hover{
+  border-color:rgba(74,211,255,0.55);
+}
 
-            <button class="choice" onclick="answer('q2','tool')">
-              <span class="k"></span>
-              <span class="t"><strong>A Tool</strong><span>Useful. Neutral. Defined by the hand that holds it.</span></span>
-            </button>
+button:active{
+  transform:translateY(1px);
+}
 
-            <button class="choice" onclick="answer('q2','weapon')">
-              <span class="k"></span>
-              <span class="t"><strong>A Weapon</strong><span>Meant to be decisive. Meant to end things.</span></span>
-            </button>
-          </div>
+.primary{
+  border-color:rgba(74,211,255,0.45);
+  box-shadow:0 0 0 2px rgba(74,211,255,0.08) inset;
+}
 
-          <div class="btnRow">
-            <button class="ghost" onclick="go(3)">BACK</button>
-          </div>
-        </section>
+.ghost{
+  background:transparent;
+  color:var(--muted);
+}
 
-        <!-- PAGE 5 -->
-        <section class="page hidden" id="p5">
-          <h1 class="h1">Attunement III</h1>
-          <p class="sub">Your compass points toward…</p>
+.choice{
+  width:100%;
+  text-align:left;
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:12px 12px;
+}
 
-          <div class="grid">
-            <div class="viz">
-              <p class="label">HOLO // PATH INDEX</p>
-              <div class="ring" aria-hidden="true"></div>
-              <div class="aura auraPad"></div>
-              <div class="tiny centerTiny">Select one response.</div>
-            </div>
+.choice .k{
+  flex:0 0 auto;
+  width:18px;
+  height:18px;
+  border-radius:6px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,0.03);
+  margin-top:2px;
+  box-shadow:0 0 0 2px rgba(0,0,0,0.25) inset;
+}
 
-            <button class="choice" onclick="answer('q3','loyalty')">
-              <span class="k"></span>
-              <span class="t"><strong>Loyalty</strong><span>You don’t abandon your people.</span></span>
-            </button>
+.choice .t{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+}
 
-            <button class="choice" onclick="answer('q3','knowledge')">
-              <span class="k"></span>
-              <span class="t"><strong>Knowledge</strong><span>Truth first. The rest follows.</span></span>
-            </button>
+.choice .t strong{
+  font-weight:700;
+}
 
-            <button class="choice" onclick="answer('q3','freedom')">
-              <span class="k"></span>
-              <span class="t"><strong>Freedom</strong><span>Your path is yours—always.</span></span>
-            </button>
-          </div>
+.choice .t span{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.35;
+}
 
-          <div class="btnRow">
-            <button class="ghost" onclick="go(4)">BACK</button>
-          </div>
-        </section>
+.viz{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:radial-gradient(600px 220px at 50% 0%, rgba(74,211,255,0.10), transparent 65%);
+  padding:14px 12px;
+  position:relative;
+  overflow:hidden;
+  min-height:120px;
+}
 
-        <!-- PAGE 6 -->
-        <section class="page hidden" id="p6">
-          <h1 class="h1">Calibrating Kyber Resonance</h1>
-          <p class="sub" id="loadText">Sampling field harmonics…</p>
+.viz .label{
+  font-size:12px;
+  color:var(--muted);
+  margin:0 0 10px;
+}
 
-          <div class="grid">
-            <div class="viz">
-              <p class="label">ANALYSIS // RUNNING</p>
-              <div class="bar"><div id="barFill"></div></div>
-              <p class="tiny loadLines" id="loadLines">
-                &gt; establishing baseline…<br/>
-                &gt; correcting drift…<br/>
-                &gt; isolating signature…
-              </p>
-            </div>
-          </div>
+.ring{
+  width:92px;
+  height:92px;
+  border-radius:50%;
+  margin:10px auto 0;
+  border:1px solid rgba(74,211,255,0.35);
+  box-shadow:
+    0 0 22px rgba(74,211,255,0.18),
+    inset 0 0 22px rgba(74,211,255,0.15);
+  position:relative;
+  animation:ringSpin 5.5s linear infinite;
+}
 
-          <div class="btnRow">
-            <button class="ghost" onclick="softReset()">ABORT</button>
-          </div>
-        </section>
+.ring::before{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius:50%;
+  border:1px dashed rgba(74,211,255,0.35);
+  filter:blur(0.1px);
+}
 
-        <!-- PAGE 7 -->
-        <section class="page hidden" id="p7">
-          <h1 class="h1">Attunement Complete</h1>
-          <p class="sub" id="resultSubtitle">The terminal has a recommendation. The choice is still yours.</p>
+.ring::after{
+  content:"";
+  position:absolute;
+  inset:26px;
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 40%, rgba(255,255,255,0.06), transparent 60%);
+  border:1px solid rgba(74,211,255,0.20);
+}
 
-          <div class="grid">
-            <div class="resultBox" id="resultBox">
-              <div class="glow" id="glow"></div>
-              <p class="big" id="resultName">—</p>
-              <p class="small" id="resultLore">—</p>
-            </div>
+@keyframes ringSpin{
+  to { transform:rotate(360deg); }
+}
 
-            <div class="viz">
-              <p class="label">FINAL // TRANSFER PROTOCOL</p>
-              <div class="aura"></div>
-              <p class="tiny resultTiny">
-                Present the chamber. Receive the crystal.
-              </p>
-            </div>
-          </div>
+.viz::after{
+  content:"";
+  position:absolute;
+  top:-30%;
+  left:-40%;
+  width:40%;
+  height:160%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  transform:rotate(18deg);
+  animation:sweep 3.8s ease-in-out infinite;
+  opacity:0.9;
+}
 
-          <div class="btnRow">
-            <button class="primary" onclick="accept()">ACCEPT ALIGNMENT</button>
-            <button class="ghost" onclick="toggleOverride(true)">If you feel the Force was mistaken today…</button>
-            <button class="ghost" onclick="softReset()">NEW ATTUNEMENT</button>
-          </div>
+@keyframes sweep{
+  0%,40%{ transform:translateX(-40%) rotate(18deg); opacity:0; }
+  55%{ opacity:0.9; }
+  100%{ transform:translateX(380%) rotate(18deg); opacity:0; }
+}
 
-          <div class="grid hidden overrideGrid" id="overridePanel">
-            <div class="resultBox">
-              <p class="big overrideTitle">Pick from Available Stockpile</p>
-              <p class="small overrideText">
-                Sometimes the field is noisy. Choose what calls to you—no judgment.
-              </p>
+.static{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.02) 0px,
+      rgba(255,255,255,0.02) 1px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0) 5px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.01) 0px,
+      rgba(255,255,255,0.01) 1px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0) 6px
+    );
+  opacity:0;
+  mix-blend-mode:overlay;
+  z-index:999;
+}
 
-              <div class="btnRow overrideButtons">
-                <button onclick="manualPick('Yellow')">Yellow</button>
-                <button onclick="manualPick('Blue')">Blue</button>
-                <button onclick="manualPick('Green')">Green</button>
-                <button onclick="manualPick('Red')">Red</button>
-                <button class="ghost" onclick="toggleOverride(false)">Never mind</button>
-              </div>
+.static.on{
+  opacity:0.75;
+  animation:staticBurst 450ms steps(2) 1;
+}
 
-              <p class="tiny overrideNote">
-                NOTE: Black is not listed. If it appears, it’s a true anomaly.
-              </p>
-            </div>
-          </div>
-        </section>
+@keyframes staticBurst{
+  0%{ transform:translate(0,0); filter:blur(0px); }
+  20%{ transform:translate(-2px,1px); filter:blur(.2px); }
+  40%{ transform:translate(2px,-1px); filter:blur(.3px); }
+  60%{ transform:translate(-1px,-2px); filter:blur(.2px); }
+  100%{ transform:translate(0,0); filter:blur(0px); }
+}
 
-      </div>
-    </div>
-  </div>
+.aura{
+  height:10px;
+  border-radius:999px;
+  background:linear-gradient(90deg, rgba(74,211,255,0.0), rgba(74,211,255,0.55), rgba(74,211,255,0.0));
+  box-shadow:0 0 18px rgba(74,211,255,0.22);
+  animation:aura 1.9s ease-in-out infinite;
+}
 
-  <script src="script.js"></script>
-</body>
-</html>
+@keyframes aura{
+  0%,100%{ transform:scaleX(0.8); opacity:0.45; }
+  50%{ transform:scaleX(1.05); opacity:0.95; }
+}
+
+.bar{
+  width:100%;
+  height:12px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(0,0,0,0.35);
+}
+
+.bar > div{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg, rgba(74,211,255,0.25), rgba(74,211,255,0.75));
+  box-shadow:0 0 18px rgba(74,211,255,0.20);
+  transition:width 120ms linear;
+}
+
+.resultBox{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px 12px;
+  background:rgba(0,0,0,0.25);
+  position:relative;
+  overflow:hidden;
+}
+
+.resultBox .big{
+  font-size:22px;
+  margin:0 0 6px;
+  letter-spacing:0.6px;
+  white-space:pre-line;
+}
+
+.resultBox .small{
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.55;
+  white-space:pre-line;
+}
+
+.glow{
+  position:absolute;
+  inset:-60px;
+  opacity:0.22;
+  filter:blur(8px);
+  pointer-events:none;
+}
+
+.tiny{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:10px;
+  line-height:1.55;
+}
+
+.hidden{
+  display:none !important;
+}
+
+/* extracted inline styles */
+.resonanceCard{
+  margin-top:10px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  background:rgba(0,0,0,0.22);
+}
+
+.resonanceRow{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.driftWrap{
+  height:10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.03);
+  margin-top:8px;
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+
+.driftFill{
+  height:100%;
+  width:56%;
+  background:linear-gradient(90deg, rgba(74,211,255,0.18), rgba(74,211,255,0.65));
+  box-shadow:0 0 14px rgba(74,211,255,0.20);
+}
+
+.resonanceTiny{
+  margin:10px 0 0;
+}
+
+.columnSet{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin-top:12px;
+}
+
+.col{
+  width:14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  animation:col 1.8s ease-in-out infinite;
+}
+
+.c1{
+  height:42px;
+  background:rgba(74,211,255,0.10);
+  animation-duration:1.7s;
+}
+
+.c2{
+  height:58px;
+  background:rgba(74,211,255,0.12);
+  animation-duration:1.9s;
+}
+
+.c3{
+  height:34px;
+  background:rgba(74,211,255,0.08);
+  animation-duration:1.6s;
+}
+
+.c4{
+  height:66px;
+  background:rgba(74,211,255,0.14);
+  animation-duration:2s;
+}
+
+@keyframes col{
+  0%,100%{ transform:translateY(0); opacity:.6; }
+  50%{ transform:translateY(-6px); opacity:1; }
+}
+
+.centerTiny{
+  text-align:center;
+  margin-top:10px;
+}
+
+.auraPad{
+  margin-top:12px;
+}
+
+.loadLines{
+  margin-top:10px;
+}
+
+.resultTiny{
+  margin-top:12px;
+}
+
+.overrideGrid{
+  margin-top:12px;
+}
+
+.overrideTitle{
+  margin:0 0 6px;
+}
+
+.overrideText{
+  margin:0 0 10px;
+}
+
+.overrideButtons{
+  margin-top:0;
+}
+
+.overrideNote{
+  margin-top:10px;
+}
+
+@media (max-width: 700px){
+  .topbar{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .badge{
+    width:100%;
+  }
+
+  .panelTop{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .status{
+    white-space:normal;
+  }
+
+  .btnRow{
+    flex-direction:column;
+  }
+
+  .btnRow button{
+    width:100%;
+  }
+
+  .resultBox .big{
+    font-size:18px;
+  }
+}
