@@ -550,7 +550,6 @@
   <div class="dust"></div>
   <div class="static" id="static"></div>
 
-  <!-- AUDIO -->
   <audio id="audioStartup" preload="auto">
     <source src="audio/light-saber-startup.mp3" type="audio/mpeg">
   </audio>
@@ -841,7 +840,7 @@
 
       if (audio.startup) audio.startup.volume = 0.70;
       if (audio.hum) audio.hum.volume = 0.16;
-      if (audio.pulse) audio.pulse.volume = 0.60;
+      if (audio.pulse) audio.pulse.volume = 0.45;
 
       Object.values(audio.voices).forEach((clip) => {
         if (clip) clip.volume = 0.95;
@@ -1092,13 +1091,12 @@
 
       setTimeout(() => {
         playVoiceForColor(color);
-      }, 350);
+      }, 300);
     }
 
     function runLoadingSequence() {
       go("p6");
       setHeader("CALIBRATION // ANALYSIS", "RUNNING");
-      playPulse();
       setHumVolume(state.secretUnlocked ? 0.24 : 0.20);
 
       const bar = $("barFill");
@@ -1273,7 +1271,6 @@
         state.secretUnlocked = true;
         $("hiddenPrompt").classList.add("hidden");
         staticGlitch();
-        playPulse();
         go("p1");
         setHeader("ATTUNEMENT // INITIALIZATION", "ANOMALY LOCKED");
       });
