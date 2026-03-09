@@ -550,6 +550,7 @@
   <div class="dust"></div>
   <div class="static" id="static"></div>
 
+  <!-- SYSTEM AUDIO -->
   <audio id="audioStartup" preload="auto">
     <source src="audio/light-saber-startup.mp3" type="audio/mpeg">
   </audio>
@@ -562,23 +563,39 @@
     <source src="audio/deep-harmonic-tonal-whoosh.mp3" type="audio/mpeg">
   </audio>
 
-  <audio id="voiceBlue" preload="auto">
+  <!-- BLUE -->
+  <audio id="voice-blue-1" preload="auto">
     <source src="audio/your-move.mp3" type="audio/mpeg">
   </audio>
 
-  <audio id="voiceGreen" preload="auto">
+  <audio id="voice-blue-2" preload="auto">
+    <source src="audio/don-t-give-hate.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- GREEN -->
+  <audio id="voice-green-1" preload="auto">
+    <source src="audio/i-m-a-jedi.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- RED -->
+  <audio id="voice-red-1" preload="auto">
     <source src="audio/ah-yes.mp3" type="audio/mpeg">
   </audio>
 
-  <audio id="voiceRed" preload="auto">
+  <audio id="voice-red-2" preload="auto">
     <source src="audio/jedi-scum.mp3" type="audio/mpeg">
   </audio>
 
-  <audio id="voiceBlack" preload="auto">
+  <audio id="voice-red-3" preload="auto">
     <source src="audio/yes-master-yes-darth-vader-ok-obedient-will-do-okay-master-star-wars-prequel-memes.mp3" type="audio/mpeg">
   </audio>
 
-  <audio id="voiceYellow" preload="auto">
+  <!-- YELLOW -->
+  <audio id="voice-yellow-1" preload="auto">
+    <source src="audio/everything-s-under-control-situation-normal.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="voice-yellow-2" preload="auto">
     <source src="audio/everything-s-perfectly-all-right-now-we-re-fine-we-re-all-fine-here-now-thank-you-how-are-you.mp3" type="audio/mpeg">
   </audio>
 
@@ -831,30 +848,44 @@
       audio.pulse = $("audioPulse");
 
       audio.voices = {
-        Blue: $("voiceBlue"),
-        Green: $("voiceGreen"),
-        Red: $("voiceRed"),
-        Yellow: $("voiceYellow"),
-        Black: $("voiceBlack")
+        Blue: [
+          $("voice-blue-1"),
+          $("voice-blue-2")
+        ],
+        Green: [
+          $("voice-green-1")
+        ],
+        Red: [
+          $("voice-red-1"),
+          $("voice-red-2"),
+          $("voice-red-3")
+        ],
+        Yellow: [
+          $("voice-yellow-1"),
+          $("voice-yellow-2")
+        ],
+        Black: []
       };
 
       if (audio.startup) audio.startup.volume = 0.70;
       if (audio.hum) audio.hum.volume = 0.16;
       if (audio.pulse) audio.pulse.volume = 0.45;
 
-      Object.values(audio.voices).forEach((clip) => {
-        if (clip) clip.volume = 0.95;
+      [audio.startup, audio.hum, audio.pulse].forEach((clip) => {
+        if (clip) clip.load();
+      });
+
+      Object.values(audio.voices).flat().forEach((clip) => {
+        if (clip) {
+          clip.volume = 0.95;
+          clip.load();
+        }
       });
     }
 
     function unlockAudio() {
       if (state.audioUnlocked) return;
       state.audioUnlocked = true;
-
-      [audio.startup, audio.hum, audio.pulse, ...Object.values(audio.voices)].forEach((clip) => {
-        if (!clip) return;
-        try { clip.load(); } catch (e) {}
-      });
     }
 
     async function playStartupAndHum() {
@@ -902,7 +933,7 @@
     }
 
     function stopVoiceLines() {
-      Object.values(audio.voices).forEach((clip) => {
+      Object.values(audio.voices).flat().forEach((clip) => {
         if (!clip) return;
         try {
           clip.pause();
@@ -913,8 +944,15 @@
 
     function playVoiceForColor(color) {
       stopVoiceLines();
-      const clip = audio.voices[color];
-      if (!clip) return;
+
+      const clips = audio.voices[color];
+      if (!clips || clips.length === 0) return;
+
+      const available = clips.filter(Boolean);
+      if (available.length === 0) return;
+
+      const clip = available[Math.floor(Math.random() * available.length)];
+
       try {
         clip.currentTime = 0;
         clip.play().catch(() => {});
